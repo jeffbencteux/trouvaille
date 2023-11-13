@@ -94,7 +94,7 @@ dhcp_addresses()
 }
 
 pcap_dir="."
-capture_time="3"
+capture_time="30"
 
 while getopts "i:r:" o; do
 	case "${o}" in
