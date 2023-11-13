@@ -7,8 +7,6 @@
 
 # shellcheck disable=SC3043
 
-RFC1918IPs="(192)"
-
 usage()
 {
 	echo "Usage: $0 [options]"
@@ -84,6 +82,17 @@ ip_addresses()
 	find_private_ips "$ips"
 }
 
+dhcp_addresses()
+{
+	print_good "Looking for IP addresses in DHCP"
+	local pcap_path="$1"
+	local ips
+
+	ips=$(tshark -r "$pcap_path" -T fields -e dhcp.ip.client -e dhcp.option.router -e dhcp.option.requested_ip_address -e dhcp.option.resource_location_server -e dhcp.option.static_route.ip -e dhcp.option.static_route.router -e dhcp.option.value.address -e dhcp.option.dhcp_server_id | uniq)
+
+	find_private_ips "$ips"
+}
+
 pcap_dir="."
 capture_time="3"
 
@@ -125,3 +134,6 @@ arp_ip_addresses "$pcap_path"
 
 print_module "IP"
 ip_addresses "$pcap_path"
+
+print_module "DHCP"
+dhcp_addresses "$pcap_path"
